@@ -1,25 +1,77 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "PA1_template"
+output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-## Loading and preprocessing the data
+## Analysis of Personal Movement Using Activity Monitoring Devices - Week 2 Assignment 
+
+## 1.Code for reading in the dataset and/or processing the data
+
+```{r}
+data<-read.csv("activity.csv")
+head(data)
+```
+
+## 2.Histogram of the total number of steps taken each day
 
 
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
+```{r, fig.width=4, fig.height=4,echo=TRUE}
+dailysteps<-aggregate(steps ~ date,data, sum,na.rm=TRUE)
+hist(dailysteps$steps,col="red", main="Histogram of Daily Steps")
+```
 
 
+## 3.Mean and median number of steps taken each day
 
-## Imputing missing values
+```{r, echo=TRUE}
+mean(dailysteps$steps,na.rm=TRUE)
+median(dailysteps$steps,na.rm=TRUE)
+```
 
 
+## 4. Time series plot of the average number of steps taken
+```{r, fig.width=8, fig.height=4, echo=TRUE}
+timesteps<-aggregate(steps ~ interval,data, mean,na.rm=TRUE)
+plot(steps ~ interval,timesteps, type="l" )
+```
 
-## Are there differences in activity patterns between weekdays and weekends?
+
+## 5. The 5-minute interval that, on average, contains the maximum number of steps
+```{r, echo=TRUE}
+timesteps$interval[timesteps$steps == max(timesteps$steps)]
+```
+
+
+## 6.Code to describe and show a strategy for imputing missing data
+```{r, echo=TRUE}
+sum(is.na(data$steps))
+```
+
+## 7.create a new dataset that is equal to the original but with the missing data filled in. 
+```{r,  fig.width=8, fig.height=4,echo=TRUE}
+data2<-data
+data2<-merge(data2,timesteps,by="interval")
+data2$steps<-data2$steps.x
+data2$steps[is.na(data2$steps.x)] <- data2$steps.y[is.na(data2$steps.x)]
+
+dailysteps2<-aggregate(steps ~ date,data2, sum)
+hist(dailysteps2$steps,col="yellow", main="Histogram of Daily Steps with NA missings value replaced")
+```
+
+## 8.Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+
+```{r, fig.width=8, fig.height=4, echo=TRUE}
+data2$date <- as.Date(data2$date, format = "%Y-%m-%d")
+data2$day<-as.factor(weekdays(data2$date))
+
+data2$weekday <- ifelse((data2$day %in% c("Saturday","Sunday")), "Weekend", "Weekdays") 
+
+weekdayssteps<- aggregate(steps ~ weekday + interval,data2, mean)
+
+library(lattice)
+xyplot(steps ~  interval | weekday, data = weekdayssteps, layout = c(1,2), type ="l", ylab="Number of Steps - Weekdays vs weekend")
+```
