@@ -1,8 +1,9 @@
 ---
-title: "PA1_template"
-output: html_document
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -47,6 +48,7 @@ timesteps$interval[timesteps$steps == max(timesteps$steps)]
 
 
 ## 6.Code to describe and show a strategy for imputing missing data
+Missings value will be replaced by interval by the average of the equivalent available interval
 ```{r, echo=TRUE}
 sum(is.na(data$steps))
 ```

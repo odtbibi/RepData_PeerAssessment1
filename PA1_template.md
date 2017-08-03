@@ -75,6 +75,7 @@ timesteps$interval[timesteps$steps == max(timesteps$steps)]
 
 
 ## 6.Code to describe and show a strategy for imputing missing data
+Missings value will be replaced by interval by the average of the equivalent available interval
 
 ```r
 sum(is.na(data$steps))
